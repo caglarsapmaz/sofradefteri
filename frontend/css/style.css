@@ -458,10 +458,9 @@ ul[role="list"] { list-style: none; margin: 0; padding: 0; }
 .newsletter-send:hover { color: var(--brown-500); }
 .newsletter-msg { font-size: 12px; color: var(--brown-700); margin: 8px 0 0; min-height: 1.2em; }
 
-.copyright {
-  font-size: 11px; color: var(--muted); text-align: center; margin: 0;
-  padding-top: 16px; padding-bottom: 20px; border-top: 1px solid rgba(110, 74, 53, .15);
-}
+/* margin: 0 auto -> .container ortalaması korunur; ayırıcı çizgi ::before ile içerik genişliğinde kalır */
+.copyright { font-size: 11px; color: var(--muted); text-align: center; margin: 0 auto; padding-bottom: 20px; }
+.copyright::before { content: ""; display: block; height: 1px; background: rgba(110, 74, 53, .15); margin-bottom: 16px; }
 .copyright a { color: var(--brown-500); }
 
 /* ==========================================================================
