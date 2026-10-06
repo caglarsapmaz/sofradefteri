@@ -1,5 +1,11 @@
 # sofra defteri — Tarif Sitesi
 
+> **Not:** Bu proje **Nesne Tabanlı Programlama** dersi için yapılmıştır.
+> Herhangi bir kâr amacı gütmemektedir.
+
+Canlı site: https://sofradefteri.vercel.app · Genel tanıtım için repo kökündeki
+[README](../README.md) dosyasına bakın. Bu dosya ayrıntılı teknik belgedir.
+
 nefisyemektarifleri.com kategori sayfalarından tarifleri BeautifulSoup ile kazıyıp
 frontend'in doğrudan okuyacağı `backend/output/recipes.json` (ve `recipes.csv`) dosyasını üretir.
 Sunucu, API ya da arayüz katmanı yoktur; çalıştırılır, JSON üretir, biter.
@@ -53,10 +59,9 @@ frontend/
 
 ### Çalıştırma
 
-Tarayıcı, `file://` ile açılan sayfadan JSON okuyamaz; bu yüzden **proje kökünden** bir yerel sunucu başlatın:
+Tarayıcı, `file://` ile açılan sayfadan JSON okuyamaz; bu yüzden **repo kökünden** bir yerel sunucu başlatın:
 
 ```bash
-cd tarif-sitesi
 python3 -m http.server 8137
 ```
 
@@ -206,3 +211,9 @@ Hangi selector'un bozulduğunu görmek için `python main.py --limit 3 --verbose
 - **Stok görsel**: `source.unsplash.com` servisi Unsplash tarafından kapatıldı ve şu an HTTP 503 dönüyor.
   Yayına almadan önce `config.STOCK_IMAGE_URL_TEMPLATE` değerini kendi yer tutucu görselinizle değiştirin.
   (Mevcut çalıştırmada 15 tarifin 15'inde de görsel siteden bulunduğu için bu yedek devreye girmedi.)
+
+## Lisans
+
+Kaynak kod MIT lisanslıdır, bkz. [LICENSE](../LICENSE). Çağlar Sapmaz tarafından yapıldı.
+Tarif içerikleri ve görseller bu lisansın kapsamında değildir; nefisyemektarifleri.com ve
+tarif sahiplerine aittir.

@@ -126,16 +126,18 @@ ul[role="list"] { list-style: none; margin: 0; padding: 0; }
 }
 
 /* ---------- Kategori karuseli ---------- */
-.cat-carousel { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 38px; }
+.cat-carousel { display: flex; align-items: flex-start; gap: 8px; margin: -6px auto 32px; }
 .carousel-arrow {
-  flex: 0 0 auto; margin-top: 38px; border: 0; background: none; color: var(--brown-700);
+  flex: 0 0 auto; margin-top: 44px; border: 0; background: none; color: var(--brown-700);
   width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center;
 }
 .carousel-arrow:hover { background: var(--cream-200); }
 .carousel-arrow:disabled { opacity: .25; cursor: default; background: none; }
-.cat-track {
+/* ".cat-carousel .cat-track": üstteki ul[role="list"] { padding: 0 } sıfırlamasını ezmek için */
+.cat-carousel .cat-track {
   flex: 1; display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory;
-  scrollbar-width: none; scroll-behavior: smooth; padding: 4px 2px;
+  /* Seçili dairenin halkası (5px) + hover yükselmesi (3px) kesilmesin diye 10px iç boşluk */
+  scrollbar-width: none; scroll-behavior: smooth; padding: 10px 8px;
 }
 .cat-track::-webkit-scrollbar { display: none; }
 .cat-track li { flex: 0 0 calc((100% - 6 * 12px) / 7); scroll-snap-align: start; }
