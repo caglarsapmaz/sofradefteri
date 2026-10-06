@@ -6,9 +6,13 @@
 Canlı site: https://sofradefteri.vercel.app · Genel tanıtım için repo kökündeki
 [README](../README.md) dosyasına bakın. Bu dosya ayrıntılı teknik belgedir.
 
-nefisyemektarifleri.com kategori sayfalarından tarifleri BeautifulSoup ile kazıyıp
-frontend'in doğrudan okuyacağı `backend/output/recipes.json` (ve `recipes.csv`) dosyasını üretir.
-Sunucu, API ya da arayüz katmanı yoktur; çalıştırılır, JSON üretir, biter.
+Proje iki parçadan oluşur:
+
+- **Backend (Python):** nefisyemektarifleri.com kategori sayfalarından tarifleri BeautifulSoup ile kazır
+  ve `backend/output/recipes.json` (ve `recipes.csv`) dosyasını üretir. Çalıştırılır, JSON üretir, biter.
+- **Frontend (HTML/CSS/JS):** yalnızca bu JSON dosyasını okuyan statik arayüzdür.
+
+Veritabanı, API ya da sunucu tarafı kod yoktur; site Vercel'de statik olarak yayınlanır.
 
 ## Kurulum
 
@@ -35,7 +39,6 @@ Seçenekler:
 | `--category K [K ...]` | Kategori kısa adları (`corba`, `et`, `sebze`, `makarna`, `pilav`, `bakliyat`, `salata`, `hamurisi`, `tatli`, `kahvalti`) ya da `hepsi` | `corba et sebze tatli` |
 | `--output KLASOR` | JSON/CSV'nin yazılacağı klasör | `backend/output` |
 | `--verbose` | Ayrıntılı (DEBUG) log | kapalı |
-
 | `--retag` | Siteye istek atmadan mevcut `recipes.json`'daki malzeme etiketlerini ve tahmini besin değerlerini yeniden hesaplar | kapalı |
 
 Örnek: `python main.py --limit 30 --category corba tatli --verbose`
@@ -54,7 +57,7 @@ frontend/
   index.html       sayfa iskeleti (duyuru şeridi, header, karusel, filtre, ızgara, footer)
   css/style.css    tüm stiller; renkler :root değişkenlerinde
   js/icons.js      kategori dairelerindeki çizim ikonları (satır içi SVG)
-  js/app.js        veri yükleme, filtreleme, sayfalama, arama, hash yönlendirme
+  js/app.js        veri yükleme, filtreleme, sayfalama, arama, History API ile yönlendirme (temiz adresler)
 ```
 
 ### Çalıştırma
@@ -76,7 +79,7 @@ Veriyi yenilemek için `backend` içinde `python main.py --category hepsi --limi
 
 ### Özellikler
 
-- **Kategori karuseli**: "tümü", veride bulunan her kategori, "30 dk tarifleri" ve "< 9 malzeme" kısayolları. Oklarla kaydırılır; tıklanan daire tek filtre olarak uygulanır, tekrar tıklanınca kaldırılır.
+- **Kategori karuseli**: "tümü", "dolabımda ne var?" ve "makro hesapla" sayfalarına geçiş daireleri, veride bulunan her kategori, "30 dk tarifleri" ve "< 9 malzeme" kısayolları. Oklarla kaydırılır; tıklanan kategori dairesi tek filtre olarak uygulanır, tekrar tıklanınca kaldırılır.
 - **Filtre paneli**: kategori, süre (`duration_minutes`), malzeme sayısı (`ingredient_count`), kişi sayısı (`servings`). Grup içinde "veya", gruplar arasında "ve" mantığı; parantez içindeki sayılar diğer seçimlere göre canlı hesaplanır.
 - **Arama** (büyüteç ikonu): tarif adında ve malzemelerde arar (ör. "kıyma").
 - **Sayfalama**: sayfa başına 12 tarif.
@@ -140,15 +143,29 @@ porsiyon sayısı gerçekçi değilse (porsiyon başı 1200 kcal üstü) porsiyo
 ## Proje yapısı
 
 ```
+README.md                genel tanıtım
+LICENSE                  MIT lisansı
+requirements.txt         Python bağımlılıkları (requests, beautifulsoup4, lxml)
+vercel.json              temiz adres kuralları (/makro, /tarif/... -> frontend/index.html)
+serve.py                 yerel geliştirme sunucusu (vercel.json'un yerel karşılığı)
+og-image.png             paylaşım önizleme görseli (1200x630)
 backend/
-  main.py              giriş noktası, argparse, özet rapor, örnek kullanım
-  config.py            ayarlar, SELECTORS, kategori URL'leri
-  models/recipe.py     Recipe ve RecipeCollection sınıfları
-  services/scraper.py  RecipeScraper (oturum, retry, robots.txt, link toplama, parse)
-  utils/helpers.py     build_image_url, slugify, clean_text ve süre/porsiyon yardımcıları
-  utils/ingredients.py malzeme kataloğu ve satırdan malzeme adı çıkarma (ingredient_tags)
-  utils/nutrition.py   miktar/birim okuma ve porsiyon başına tahmini kalori-makro (nutrition)
-  output/              recipes.json, recipes.csv
+  main.py                giriş noktası, argparse, özet rapor, örnek kullanım
+  config.py              ayarlar, SELECTORS, kategori URL'leri
+  models/recipe.py       Recipe ve RecipeCollection sınıfları
+  services/scraper.py    RecipeScraper (oturum, retry, robots.txt, link toplama, parse)
+  utils/helpers.py       build_image_url, slugify, clean_text ve süre/porsiyon yardımcıları
+  utils/ingredients.py   malzeme kataloğu ve satırdan malzeme adı çıkarma (ingredient_tags)
+  utils/nutrition.py     miktar/birim okuma ve porsiyon başına tahmini kalori-makro (nutrition)
+  output/                recipes.json, recipes.csv, recipes_aciklamali.jsonc (sunum için yorumlu örnek)
+frontend/
+  index.html             sayfa iskeleti ve paylaşım etiketleri
+  css/style.css          tüm stiller
+  js/app.js              uygulama mantığı
+  js/icons.js            çizim ikonları
+docs/
+  TEKNIK.md              bu belge
+  ekran-goruntusu.png    README ekran görüntüsü
 ```
 
 ## Parse stratejisi
@@ -180,10 +197,8 @@ Dosyanın kökünde iki alan var: `meta` ve `recipes`.
 - Hiçbir alan `null` değildir. Metin alanlarında veri yoksa `"Bilgi bulunamadı"` yazılır; frontend bu değeri
   gizleyebilir ya da "—" olarak gösterebilir.
 - `source_url` her tarifin orijinal adresidir; detay sayfasında kaynak linki olarak gösterilmelidir.
-
 - `ingredient_tags` tarifin standart malzeme adlarıdır (ör. `["mercimek", "soğan", "tuz"]`); "dolabımda ne var?" eşleştirmesi bununla yapılır.
   `meta.ingredients` ise tüm malzemelerin `name`, `group`, `staple` (evde genelde bulunur), `count` (kaç tarifte geçiyor) bilgisini içerir.
-
 - `nutrition` porsiyon başına tahmini değerlerdir: `calories` (kcal), `protein`, `carbs`, `fat` (gram),
   `servings_used` (hesapta kullanılan kişi sayısı), `servings_adjusted`, `confidence` (miktarı okunabilen satır oranı, 0-1)
   ve her zaman `estimated: true`. CSV'de `calories`, `protein_g`, `carbs_g`, `fat_g` sütunları olarak yer alır.
@@ -214,9 +229,11 @@ Hangi selector'un bozulduğunu görmek için `python main.py --limit 3 --verbose
 - **Telif hakkı**: Tarif metinleri ve fotoğraflar site ile tarif sahiplerine aittir. Ödev ya da kişisel kullanım dışında,
   herkese açık bir sitede yayınlamadan önce nefisyemektarifleri.com'dan izin alın ve her tarifte `source_url` ile kaynak gösterin.
   Görselleri kendi sitenizden onların sunucusuna doğrudan bağlamak (hotlink) da ayrıca sorun yaratabilir.
-- **Stok görsel**: `source.unsplash.com` servisi Unsplash tarafından kapatıldı ve şu an HTTP 503 dönüyor.
-  Yayına almadan önce `config.STOCK_IMAGE_URL_TEMPLATE` değerini kendi yer tutucu görselinizle değiştirin.
-  (Mevcut çalıştırmada 15 tarifin 15'inde de görsel siteden bulunduğu için bu yedek devreye girmedi.)
+- **Stok görsel**: Görseli bulunamayan tarife `config.STOCK_IMAGE_URL_TEMPLATE` ile bir adres yazılır ve
+  `image_source: "stock"` olarak işaretlenir. Ancak `source.unsplash.com` servisi Unsplash tarafından kapatıldı
+  (HTTP 503). Bu yüzden arayüz `"stock"` işaretli görselleri hiç yüklemez, yerine kategori ikonlu bir yer tutucu
+  gösterir. JSON'u başka bir arayüzde kullanacaksanız bu şablonu çalışan bir görsel adresiyle değiştirin.
+  Mevcut veride 60 tarifin 60'ında görsel siteden bulunduğu için bu yedek hiç devreye girmiyor.
 
 ## Lisans
 
