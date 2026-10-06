@@ -77,7 +77,6 @@
     navToggle: $(".nav-toggle"),
     nav: $("#main-nav"),
     footerCats: $("#footer-cats"),
-    footerStrip: $("#footer-strip"),
     newsletter: $("#newsletter"),
   };
 
@@ -552,14 +551,6 @@
       .sort((a, b) => b[1] - a[1] || CATEGORY_ORDER.indexOf(a[0]) - CATEGORY_ORDER.indexOf(b[0]))
       .slice(0, 3)
       .map(([c]) => `<li><a href="/" data-goto-cat="${esc(c)}">${esc(categoryLabel(c))}</a></li>`)
-      .join("");
-
-    const withImage = state.recipes.filter((r) => r.image_source !== "stock");
-    const step = Math.max(1, Math.floor(withImage.length / 6));
-    const strip = [];
-    for (let i = 0; i < withImage.length && strip.length < 6; i += step) strip.push(withImage[i]);
-    els.footerStrip.innerHTML = strip
-      .map((r) => `<li><a href="/tarif/${encodeURIComponent(r.slug)}" aria-label="${esc(r.title)}">${imageHtml(r)}</a></li>`)
       .join("");
 
     $("#year").textContent = new Date().getFullYear();
