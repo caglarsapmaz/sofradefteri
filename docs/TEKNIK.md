@@ -59,13 +59,19 @@ frontend/
 
 ### Çalıştırma
 
-Tarayıcı, `file://` ile açılan sayfadan JSON okuyamaz; bu yüzden **repo kökünden** bir yerel sunucu başlatın:
+Tarayıcı, `file://` ile açılan sayfadan JSON okuyamaz; bu yüzden **repo kökünden** yerel sunucuyu başlatın:
 
 ```bash
-python3 -m http.server 8137
+python serve.py
 ```
 
-Ardından http://localhost:8137/frontend/ adresini açın (kök adres otomatik yönlendirir).
+Ardından http://localhost:8137 adresini açın.
+
+Site History API ile temiz adresler kullanır (`/`, `/dolabim`, `/makro`, `/hakkinda`, `/iletisim`,
+`/tarif/<slug>`); sayfalar arası geçişte sayfa yenilenmez. Bu adreslere doğrudan girildiğinde ya da
+sayfa yenilendiğinde `frontend/index.html` sunulmalıdır: yerelde `serve.py`, Vercel'de `vercel.json`
+bunu yapar. Bu yüzden `python -m http.server` yerine `serve.py` kullanılmalıdır. Eski
+`/frontend/#/...` bağlantıları açılışta otomatik olarak yeni adrese çevrilir.
 Veriyi yenilemek için `backend` içinde `python main.py --category hepsi --limit 60` çalıştırıp sayfayı yenilemeniz yeterli.
 
 ### Özellikler
@@ -74,13 +80,13 @@ Veriyi yenilemek için `backend` içinde `python main.py --category hepsi --limi
 - **Filtre paneli**: kategori, süre (`duration_minutes`), malzeme sayısı (`ingredient_count`), kişi sayısı (`servings`). Grup içinde "veya", gruplar arasında "ve" mantığı; parantez içindeki sayılar diğer seçimlere göre canlı hesaplanır.
 - **Arama** (büyüteç ikonu): tarif adında ve malzemelerde arar (ör. "kıyma").
 - **Sayfalama**: sayfa başına 12 tarif.
-- **Detay sayfası** (`#/tarif/<slug>`): görsel, porsiyon/süre/malzeme sayısı, işaretlenebilir malzeme listesi, orijinal tarife bağlantı ve aynı kategoriden 4 öneri. Adres paylaşılabilir; dizine dönünce filtreler ve kaydırma konumu korunur.
+- **Detay sayfası** (`/tarif/<slug>`): görsel, porsiyon/süre/malzeme sayısı, işaretlenebilir malzeme listesi, orijinal tarife bağlantı ve aynı kategoriden 4 öneri. Adres paylaşılabilir; dizine dönünce filtreler ve kaydırma konumu korunur.
 - `image_source` "stock" ise ya da görsel yüklenemezse kategori ikonlu yer tutucu gösterilir.
 - Mobilde menü ve filtre paneli açılır-kapanır düğmelere dönüşür; ızgara 2 sütuna iner.
 - Kazınan tüm metinler ekrana basılmadan önce HTML kaçışından geçirilir.
 - Bülten formu yalnızca e-posta doğrulaması yapar; sunucu katmanı olmadığı için veri gönderilmez.
 
-### Dolabımda ne var? (`#/dolabim`)
+### Dolabımda ne var? (`/dolabim`)
 
 Evdeki malzemeleri seçerek yapılabilecek tarifleri bulur. Menüden ya da kategori karuselindeki buzdolabı ikonundan açılır.
 
@@ -101,7 +107,7 @@ Yeni bir malzeme tanıtmak için `ingredients.py` içindeki `_CATALOG_ROWS` list
 cd backend && python main.py --retag
 ```
 
-### Makro hesapla (`#/makro`)
+### Makro hesapla (`/makro`)
 
 "Günlük Makro Besin İhtiyacı Hesaplama Aracı": cinsiyet, aktivite düzeyi, hedef (kilo vermek / korumak / kilo almak / kas yapmak), yaş, boy ve kilo girilir.
 
@@ -121,7 +127,7 @@ cd backend && python main.py --retag
 öğün kalorisine yakınlık, protein oranı ve yağ oranına göre puanlanır. Kas yapma ve kilo vermede protein ağırlığı
 daha yüksektir. İlk 12 tarif gösterilir, kategoriye göre süzülebilir.
 
-**Paylaş** form değerlerini bağlantıya ekler (`#/makro?c=kadin&a=1.55&h=ver&y=32&b=172&k=69`); bağlantı açıldığında
+**Paylaş** form değerlerini bağlantıya ekler (`/makro?c=kadin&a=1.55&h=ver&y=32&b=172&k=69`); bağlantı açıldığında
 sonuç otomatik hesaplanır. **Sitene Ekle** bir `<iframe>` kodu verir; `?embed=1` ile açılan sayfada üst menü ve
 alt bilgi gizlenir, tarif kartları yeni sekmede açılır.
 

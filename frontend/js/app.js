@@ -2,10 +2,13 @@
  * sofra defteri — tarif dizini
  *
  * Tek veri kaynağı backend'in ürettiği recipes.json dosyasıdır.
- * Yönlendirme hash tabanlıdır, sunucu tarafı yönlendirme gerekmez:
- *   #/                 -> tarif dizini (filtre + ızgara + sayfalama)
- *   #/tarif/<slug>     -> tarif detayı
- *   #/hakkinda, #/iletisim -> basit sayfalar
+ * Yönlendirme History API ile yapılır (temiz adresler, sayfa yenilenmez):
+ *   /                      -> tarif dizini (filtre + ızgara + sayfalama)
+ *   /tarif/<slug>          -> tarif detayı
+ *   /dolabim, /makro       -> dolabımda ne var?, makro hesaplama
+ *   /hakkinda, /iletisim   -> basit sayfalar
+ * Bu adreslere doğrudan girildiğinde Vercel'de vercel.json, yerelde serve.py
+ * isteği frontend/index.html'e yönlendirir.
  */
 (function () {
   "use strict";
@@ -13,7 +16,7 @@
   // ------------------------------------------------------------------ //
   // Ayarlar
   // ------------------------------------------------------------------ //
-  const DATA_URL = "../backend/output/recipes.json";
+  const DATA_URL = "/backend/output/recipes.json";
   const PAGE_SIZE = 12;
   const MISSING = "Bilgi bulunamadı";
   const QUICK_MINUTES = 30;
@@ -236,7 +239,7 @@
     if (!btn) return;
     const key = btn.dataset.key;
     if (key === "pantry" || key === "macro") {
-      location.hash = key === "pantry" ? "#/dolabim" : "#/makro";
+      navigate(key === "pantry" ? "/dolabim" : "/makro");
       return;
     }
     const wasActive = isCarouselActive(key);
@@ -300,7 +303,7 @@
   // ------------------------------------------------------------------ //
   function cardHtml(r) {
     const badge = r.duration_minutes > 0 ? `<span class="card-badge">${esc(r.duration)}</span>` : "";
-    return `<li><a class="recipe-card" href="#/tarif/${encodeURIComponent(r.slug)}">
+    return `<li><a class="recipe-card" href="/tarif/${encodeURIComponent(r.slug)}">
       <div class="card-media">${imageHtml(r)}${badge}</div>
       <h3 class="card-title">${esc(r.title)}</h3>
     </a></li>`;
@@ -376,7 +379,7 @@
     if (!r) {
       els.viewDetail.innerHTML = `<div class="container simple-page">
         <h1 class="page-title">tarif bulunamadı</h1>
-        <p>aradığınız tarif kaldırılmış ya da adresi değişmiş olabilir. <a href="#/">tarif dizinine dön</a>.</p></div>`;
+        <p>aradığınız tarif kaldırılmış ya da adresi değişmiş olabilir. <a href="/">tarif dizinine dön</a>.</p></div>`;
       document.title = "tarif bulunamadı · sofra defteri";
       return;
     }
@@ -394,15 +397,15 @@
     const source = safeUrl(r.source_url);
     els.viewDetail.innerHTML = `<article class="detail container">
       <nav class="breadcrumb" aria-label="konum">
-        <a href="#/">tarifler</a><span aria-hidden="true">/</span>
-        ${has(r.category) ? `<a href="#/" data-goto-cat="${esc(r.category)}">${esc(categoryLabel(r.category))}</a><span aria-hidden="true">/</span>` : ""}
+        <a href="/">tarifler</a><span aria-hidden="true">/</span>
+        ${has(r.category) ? `<a href="/" data-goto-cat="${esc(r.category)}">${esc(categoryLabel(r.category))}</a><span aria-hidden="true">/</span>` : ""}
         <span aria-current="page">${esc(lower(r.title))}</span>
       </nav>
 
       <div class="detail-grid">
         <div class="detail-media">${imageHtml(r, "", true)}</div>
         <div>
-          ${has(r.category) ? `<a href="#/" class="detail-cat" data-goto-cat="${esc(r.category)}">${esc(categoryLabel(r.category))}</a>` : ""}
+          ${has(r.category) ? `<a href="/" class="detail-cat" data-goto-cat="${esc(r.category)}">${esc(categoryLabel(r.category))}</a>` : ""}
           <h1 class="detail-title">${esc(r.title)}</h1>
           <div class="detail-meta">
             ${meta.map((m) => `<div class="meta-item">${m.icon}<span class="meta-label">${m.label}</span><span class="meta-value">${esc(m.value)}</span></div>`).join("")}
@@ -437,11 +440,11 @@
       <p>şu an <strong>${state.recipes.length}</strong> tarif listeleniyor. tüm tarif içerikleri ve görseller
       <a href="https://www.nefisyemektarifleri.com" target="_blank" rel="noopener">nefisyemektarifleri.com</a>
       ve tarif sahiplerine aittir; her tarifin detay sayfasında orijinal kaynağa bağlantı bulunur.</p>
-      <p><a href="#/">tarif dizinine dön →</a></p></div>`,
+      <p><a href="/">tarif dizinine dön →</a></p></div>`,
     iletisim: () => `<div class="simple-page">
       <h1 class="page-title">iletişim</h1>
       <p>öneri, tarif isteği ya da hata bildirimi için sayfanın altındaki “haberdar ol” formunu kullanabilirsiniz.</p>
-      <p><a href="#/">tarif dizinine dön →</a></p></div>`,
+      <p><a href="/">tarif dizinine dön →</a></p></div>`,
   };
 
   // ------------------------------------------------------------------ //
@@ -461,10 +464,28 @@
     state.currentView = view;
   }
 
+  // Bu adresler uygulamanın kendi sayfalarıdır; tıklanınca sayfa yenilenmeden açılır.
+  const APP_ROUTE = /^\/(?:|dolabim|makro|hakkinda|iletisim|tarif\/[^/]+)$/;
+
+  // Uygulama içi geçiş: adresi History API ile değiştirir, sayfayı yeniden yüklemez.
+  function navigate(url) {
+    if (url !== location.pathname + location.search) history.pushState(null, "", url);
+    route();
+  }
+
+  // Eski "#/makro?..." biçimli bağlantıları yeni temiz adrese çevirir (paylaşılmış linkler kırılmasın).
+  function upgradeHashUrl() {
+    if (!location.hash.startsWith("#/")) return;
+    const [path, query = ""] = location.hash.slice(1).split("?");
+    const params = new URLSearchParams(query);
+    if (new URLSearchParams(location.search).get("embed") === "1") params.set("embed", "1");
+    const qs = params.toString();
+    history.replaceState(null, "", path + (qs ? `?${qs}` : ""));
+  }
+
   function route() {
-    const raw = location.hash.replace(/^#/, "") || "/";
-    const [rawPath, query = ""] = raw.split("?");
-    const hash = decodeURIComponent(rawPath) || "/";
+    const hash = decodeURIComponent(location.pathname).replace(/\/+$/, "") || "/";
+    const query = location.search.slice(1);
     els.nav.classList.remove("is-open");
     els.navToggle.setAttribute("aria-expanded", "false");
 
@@ -512,12 +533,12 @@
   function gotoCategory(cat) {
     clearFilters();
     state.selected.cat.add(cat);
-    if (location.hash === "#/" || location.hash === "") {
+    if (state.currentView === "index") {
       renderIndex();
       els.viewIndex.scrollIntoView();
     } else {
       state.indexScroll = 0;
-      location.hash = "#/";
+      navigate("/");
     }
   }
 
@@ -530,7 +551,7 @@
     els.footerCats.innerHTML = [...counts.entries()]
       .sort((a, b) => b[1] - a[1] || CATEGORY_ORDER.indexOf(a[0]) - CATEGORY_ORDER.indexOf(b[0]))
       .slice(0, 3)
-      .map(([c]) => `<li><a href="#/" data-goto-cat="${esc(c)}">${esc(categoryLabel(c))}</a></li>`)
+      .map(([c]) => `<li><a href="/" data-goto-cat="${esc(c)}">${esc(categoryLabel(c))}</a></li>`)
       .join("");
 
     const withImage = state.recipes.filter((r) => r.image_source !== "stock");
@@ -538,7 +559,7 @@
     const strip = [];
     for (let i = 0; i < withImage.length && strip.length < 6; i += step) strip.push(withImage[i]);
     els.footerStrip.innerHTML = strip
-      .map((r) => `<li><a href="#/tarif/${encodeURIComponent(r.slug)}" aria-label="${esc(r.title)}">${imageHtml(r)}</a></li>`)
+      .map((r) => `<li><a href="/tarif/${encodeURIComponent(r.slug)}" aria-label="${esc(r.title)}">${imageHtml(r)}</a></li>`)
       .join("");
 
     $("#year").textContent = new Date().getFullYear();
@@ -551,7 +572,8 @@
   // Olaylar
   // ------------------------------------------------------------------ //
   function bindEvents() {
-    window.addEventListener("hashchange", route);
+    // Geri / ileri tuşları
+    window.addEventListener("popstate", route);
 
     els.catTrack.addEventListener("click", onCarouselClick);
     els.catTrack.addEventListener("scroll", updateArrows, { passive: true });
@@ -574,7 +596,16 @@
       if (goto) {
         e.preventDefault();
         gotoCategory(goto.dataset.gotoCat);
+        return;
       }
+      // Site içi bağlantılar: tam sayfa yüklemesi yerine History API ile geçiş.
+      // Yeni sekme (cmd/ctrl tıklama, target) ve dosya bağlantıları tarayıcıya bırakılır.
+      const link = e.target.closest("a[href]");
+      if (!link || e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      if (link.target || link.hasAttribute("download") || link.origin !== location.origin) return;
+      if (!APP_ROUTE.test(link.pathname)) return;
+      e.preventDefault();
+      navigate(link.pathname + link.search);
     });
 
     els.filterToggle.addEventListener("click", () => {
@@ -602,7 +633,7 @@
         state.page = 1;
         if (state.currentView !== "index") {
           state.indexScroll = 0;
-          location.hash = "#/";
+          navigate("/");
         } else {
           renderIndex();
         }
@@ -708,7 +739,7 @@
     const status = m.missing.length
       ? `<p class="match-text">eksik: <strong>${m.missing.map(esc).join(", ")}</strong></p>`
       : `<p class="match-text is-ready">tüm malzemeler dolabında</p>`;
-    return `<li><a class="recipe-card" href="#/tarif/${encodeURIComponent(r.slug)}">
+    return `<li><a class="recipe-card" href="/tarif/${encodeURIComponent(r.slug)}">
       <div class="card-media">${imageHtml(r)}<span class="card-badge">${m.matched}/${m.required} malzeme</span></div>
       <h3 class="card-title">${esc(r.title)}</h3>
       <div class="card-match">
@@ -861,7 +892,7 @@
     const text = m.missing.length
       ? `dolabına göre eksik: <strong>${m.missing.map(esc).join(", ")}</strong>`
       : `<strong>bu tarifin tüm malzemeleri dolabında.</strong>`;
-    return `<p class="pantry-note">${text} · <a href="#/dolabim">dolabı düzenle</a></p>`;
+    return `<p class="pantry-note">${text} · <a href="/dolabim">dolabı düzenle</a></p>`;
   }
 
 
@@ -1002,11 +1033,11 @@
 
   function macroShareUrl(f) {
     const p = new URLSearchParams({ c: f.cinsiyet, a: f.aktivite, h: f.hedef, y: f.yas, b: f.boy, k: f.kilo });
-    return `${location.origin}${location.pathname}#/makro?${p}`;
+    return `${location.origin}/makro?${p}`;
   }
 
   function macroEmbedCode() {
-    const src = `${location.origin}${location.pathname}?embed=1#/makro`;
+    const src = `${location.origin}/makro?embed=1`;
     return `<iframe src="${src}" title="Günlük makro besin ihtiyacı hesaplama aracı" width="100%" height="1100" style="border:0" loading="lazy"></iframe>`;
   }
 
@@ -1131,8 +1162,8 @@
     const r = s.r;
     const embed = document.documentElement.classList.contains("is-embed");
     const href = embed
-      ? `${location.origin}${location.pathname}#/tarif/${encodeURIComponent(r.slug)}`
-      : `#/tarif/${encodeURIComponent(r.slug)}`;
+      ? `${location.origin}/tarif/${encodeURIComponent(r.slug)}`
+      : `/tarif/${encodeURIComponent(r.slug)}`;
     const portion = s.portion === 1 ? "1 porsiyon" : `${String(s.portion).replace(".", ",")} porsiyon`;
     return `<li><a class="recipe-card" href="${esc(href)}"${embed ? ' target="_blank" rel="noopener"' : ""}>
       <div class="card-media">${imageHtml(r)}<span class="card-badge">${s.kcal} kcal</span>
@@ -1219,7 +1250,9 @@
     }
     state.macroForm = f;
     renderMacroResult(f, calcMacros(f));
-    history.replaceState(null, "", `#/makro?${new URLSearchParams({ c: f.cinsiyet, a: f.aktivite, h: f.hedef, y: f.yas, b: f.boy, k: f.kilo })}`);
+    const params = new URLSearchParams({ c: f.cinsiyet, a: f.aktivite, h: f.hedef, y: f.yas, b: f.boy, k: f.kilo });
+    if (document.documentElement.classList.contains("is-embed")) params.set("embed", "1");
+    history.replaceState(null, "", `/makro?${params}`);
     if (scroll) $("#macro-result").scrollIntoView({ block: "start" });
   }
 
@@ -1251,7 +1284,7 @@
       showMacroErrors(e.target, {});
       $("#macro-result").innerHTML = "";
       state.macroForm = null;
-      history.replaceState(null, "", "#/makro");
+      history.replaceState(null, "", document.documentElement.classList.contains("is-embed") ? "/makro?embed=1" : "/makro");
     });
     els.viewMacro.addEventListener("click", async (e) => {
       const btn = e.target.closest("[data-macro]");
@@ -1261,7 +1294,7 @@
         const form = $("#macro-form");
         const f = readMacroForm(form);
         const filled = !Object.keys(validateMacro(f)).length;
-        const url = filled ? macroShareUrl(f) : `${location.origin}${location.pathname}#/makro`;
+        const url = filled ? macroShareUrl(f) : `${location.origin}/makro`;
         if (navigator.share) {
           try {
             await navigator.share({ title: "Günlük makro besin ihtiyacı", url });
@@ -1329,6 +1362,7 @@
   }
 
   async function init() {
+    upgradeHashUrl();
     // ?embed=1 ile açılırsa (Sitene Ekle) yalnızca araç gösterilir.
     if (new URLSearchParams(location.search).get("embed") === "1") {
       document.documentElement.classList.add("is-embed");

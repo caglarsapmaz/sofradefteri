@@ -101,8 +101,12 @@ python main.py --retag                         # siteye gitmeden etiket ve besin
 
 # Siteyi aç
 cd ..
-python3 -m http.server 8137                    # http://localhost:8137/frontend/
+python serve.py                                # http://localhost:8137
 ```
+
+Site temiz adresler kullanır: `/`, `/dolabim`, `/makro`, `/hakkinda`, `/iletisim`, `/tarif/<slug>`.
+`python -m http.server` bu adresleri tanımadığı için sayfa yenilenince 404 verir; yerelde
+`serve.py` kullanılmalıdır. Vercel'de aynı işi `vercel.json` yapar.
 
 Komut seçenekleri: `--limit`, `--category`, `--output`, `--verbose`, `--retag`.
 
@@ -116,6 +120,8 @@ Komut seçenekleri: `--limit`, `--category`, `--output`, `--verbose`, `--retag`.
 
 - Vercel `requirements.txt` dosyasını görünce projeyi Python sanabilir. Framework Preset
   mutlaka **Other** olmalı, aksi halde derleme "No python entrypoint found" hatası verir.
+- `vercel.json`, temiz adreslere (`/makro`, `/tarif/...`) doğrudan girildiğinde ya da sayfa
+  yenilendiğinde siteyi açar. Eski `/frontend/#/...` bağlantıları otomatik olarak yeni adrese yönlenir.
 - Kazıyıcı Vercel'de çalışmaz. Tarifleri güncellemek için `python main.py` yerelde çalıştırılır
   ve yeni `recipes.json` repoya gönderilir. Vercel siteyi kendiliğinden yeniden yayınlar.
 
@@ -132,7 +138,8 @@ Komut seçenekleri: `--limit`, `--category`, `--output`, `--verbose`, `--retag`.
 ## Proje yapısı
 
 ```
-index.html                 kök sayfa (frontend/'e yönlendirir, paylaşım etiketleri)
+vercel.json                temiz adres kuralları (/makro, /tarif/... -> frontend/index.html)
+serve.py                   yerel geliştirme sunucusu (vercel.json'un yerel karşılığı)
 og-image.png               paylaşım önizleme görseli (1200x630)
 requirements.txt
 LICENSE

@@ -6,13 +6,13 @@
   <title>sofra defteri · tarif dizini</title>
   <meta name="description" content="Türk mutfağından seçilmiş tarifler: kategori, süre ve malzemeye göre filtrele, dolabındaki malzemelerle yapabileceklerini bul, günlük makro ihtiyacını hesapla.">
   <!-- Paylaşım önizlemesi (WhatsApp, X, LinkedIn, Facebook...) -->
-  <link rel="canonical" href="https://sofradefteri.vercel.app/frontend/">
+  <link rel="canonical" href="https://sofradefteri.vercel.app/">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="sofra defteri">
   <meta property="og:locale" content="tr_TR">
   <meta property="og:title" content="sofra defteri · tarif dizini">
   <meta property="og:description" content="Türk mutfağından seçilmiş tarifler: kategori, süre ve malzemeye göre filtrele, dolabındaki malzemelerle yapabileceklerini bul, günlük makro ihtiyacını hesapla.">
-  <meta property="og:url" content="https://sofradefteri.vercel.app/frontend/">
+  <meta property="og:url" content="https://sofradefteri.vercel.app/">
   <meta property="og:image" content="https://sofradefteri.vercel.app/og-image.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
@@ -26,7 +26,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Lora:wght@400;500;600&family=Sacramento&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css">
+  <!-- Sayfa /tarif/... gibi alt adreslerde de açıldığı için dosya yolları kökten verilir -->
+  <link rel="stylesheet" href="/frontend/css/style.css">
 </head>
 <body>
   <a class="skip-link" href="#main">içeriğe geç</a>
@@ -41,7 +42,7 @@
   <!-- Üst menü -->
   <header class="site-header">
     <div class="container header-inner">
-      <a href="#/" class="logo" aria-label="sofra defteri ana sayfa">
+      <a href="/" class="logo" aria-label="sofra defteri ana sayfa">
         <span class="logo-word">s<span class="logo-dot" aria-hidden="true"></span>fra</span>
         <span class="logo-script">defteri</span>
       </a>
@@ -51,11 +52,11 @@
       </button>
 
       <nav id="main-nav" class="main-nav" aria-label="ana menü">
-        <a href="#/" class="nav-link is-active" data-nav="recipes">tarifler <span class="caret" aria-hidden="true">▾</span></a>
-        <a href="#/dolabim" class="nav-link" data-nav="pantry">dolabımda ne var?</a>
-        <a href="#/makro" class="nav-link" data-nav="macro">makro hesapla</a>
-        <a href="#/hakkinda" class="nav-link" data-nav="about">hakkında</a>
-        <a href="#/iletisim" class="nav-link" data-nav="contact">iletişim</a>
+        <a href="/" class="nav-link is-active" data-nav="recipes">tarifler <span class="caret" aria-hidden="true">▾</span></a>
+        <a href="/dolabim" class="nav-link" data-nav="pantry">dolabımda ne var?</a>
+        <a href="/makro" class="nav-link" data-nav="macro">makro hesapla</a>
+        <a href="/hakkinda" class="nav-link" data-nav="about">hakkında</a>
+        <a href="/iletisim" class="nav-link" data-nav="contact">iletişim</a>
       </nav>
 
       <button class="search-toggle" type="button" aria-expanded="false" aria-controls="search-bar" aria-label="tariflerde ara">
@@ -120,7 +121,7 @@
   <footer class="site-footer">
     <div class="container footer-grid">
       <div class="footer-brand">
-        <a href="#/" class="logo" aria-label="sofra defteri ana sayfa">
+        <a href="/" class="logo" aria-label="sofra defteri ana sayfa">
           <span class="logo-word">s<span class="logo-dot" aria-hidden="true"></span>fra</span>
           <span class="logo-script">defteri</span>
         </a>
@@ -136,11 +137,11 @@
       <div class="footer-col">
         <h2 class="footer-heading">menü</h2>
         <ul role="list">
-          <li><a href="#/">tarifler</a></li>
-          <li><a href="#/dolabim">dolabımda ne var?</a></li>
-          <li><a href="#/makro">makro hesapla</a></li>
-          <li><a href="#/hakkinda">hakkında</a></li>
-          <li><a href="#/iletisim">iletişim</a></li>
+          <li><a href="/">tarifler</a></li>
+          <li><a href="/dolabim">dolabımda ne var?</a></li>
+          <li><a href="/makro">makro hesapla</a></li>
+          <li><a href="/hakkinda">hakkında</a></li>
+          <li><a href="/iletisim">iletişim</a></li>
         </ul>
       </div>
 
@@ -171,7 +172,7 @@
     </p>
   </footer>
 
-  <script src="js/icons.js"></script>
-  <script src="js/app.js"></script>
+  <script src="/frontend/js/icons.js"></script>
+  <script src="/frontend/js/app.js"></script>
 </body>
 </html>

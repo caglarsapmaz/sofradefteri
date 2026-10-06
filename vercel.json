@@ -1,0 +1,13 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "redirects": [
+    { "source": "/frontend", "destination": "/", "permanent": true },
+    { "source": "/frontend/", "destination": "/", "permanent": true },
+    { "source": "/frontend/index.html", "destination": "/", "permanent": true }
+  ],
+  "rewrites": [
+    { "source": "/", "destination": "/frontend/index.html" },
+    { "source": "/(dolabim|makro|hakkinda|iletisim)", "destination": "/frontend/index.html" },
+    { "source": "/tarif/:slug", "destination": "/frontend/index.html" }
+  ]
+}
