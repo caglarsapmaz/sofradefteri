@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>sofra defteri · tarif dizini</title>
+  <meta name="description" content="Çorbadan tatlıya, kategori, süre ve malzeme sayısına göre filtrelenebilir tarif dizini.">
+  <meta name="referrer" content="no-referrer">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%23f6ebe3'/%3E%3Cpath d='M14 32h36a18 18 0 0 1-36 0z' fill='%23e9a46a' stroke='%236e4a35' stroke-width='3'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Lora:wght@400;500;600&family=Sacramento&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">içeriğe geç</a>
+
+  <!-- Duyuru şeridi -->
+  <div class="announce">
+    <a href="https://www.nefisyemektarifleri.com" target="_blank" rel="noopener">
+      tüm tarifler nefisyemektarifleri.com'dan derlenmiştir <span aria-hidden="true">→</span>
+    </a>
+  </div>
+
+  <!-- Üst menü -->
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="#/" class="logo" aria-label="sofra defteri ana sayfa">
+        <span class="logo-word">s<span class="logo-dot" aria-hidden="true"></span>fra</span>
+        <span class="logo-script">defteri</span>
+      </a>
+
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="main-nav" aria-label="menüyü aç">
+        <span></span><span></span><span></span>
+      </button>
+
+      <nav id="main-nav" class="main-nav" aria-label="ana menü">
+        <a href="#/" class="nav-link is-active" data-nav="recipes">tarifler <span class="caret" aria-hidden="true">▾</span></a>
+        <a href="#/dolabim" class="nav-link" data-nav="pantry">dolabımda ne var?</a>
+        <a href="#/makro" class="nav-link" data-nav="macro">makro hesapla</a>
+        <a href="#/hakkinda" class="nav-link" data-nav="about">hakkında</a>
+        <a href="#/iletisim" class="nav-link" data-nav="contact">iletişim</a>
+      </nav>
+
+      <button class="search-toggle" type="button" aria-expanded="false" aria-controls="search-bar" aria-label="tariflerde ara">
+        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M15.5 15.5 21 21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+
+    <div id="search-bar" class="search-bar" hidden>
+      <div class="container">
+        <label class="search-field">
+          <span class="visually-hidden">tarif ya da malzeme ara</span>
+          <input id="search-input" type="search" placeholder="tarif adı ya da malzeme ara… (ör. mercimek, kıyma)" autocomplete="off">
+        </label>
+      </div>
+    </div>
+  </header>
+
+  <main id="main">
+    <!-- Liste görünümü -->
+    <section id="view-index" class="view" aria-labelledby="index-title">
+      <h1 id="index-title" class="page-title">tarif dizini</h1>
+
+      <div class="cat-carousel container">
+        <button class="carousel-arrow prev" type="button" aria-label="önceki kategoriler">
+          <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M20 12H5m6-6-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <ul id="cat-track" class="cat-track" role="list"></ul>
+        <button class="carousel-arrow next" type="button" aria-label="sonraki kategoriler">
+          <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M4 12h15m-6-6 6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+
+      <div class="index-layout container">
+        <button class="filter-toggle" type="button" aria-expanded="false" aria-controls="filters">
+          filtrele <span id="filter-badge" class="filter-badge" hidden></span>
+        </button>
+
+        <aside id="filters" class="filters" aria-label="filtreler"></aside>
+
+        <div class="results">
+          <p id="result-info" class="result-info" aria-live="polite"></p>
+          <ul id="recipe-grid" class="recipe-grid" role="list"></ul>
+          <nav id="pagination" class="pagination" aria-label="sayfalar"></nav>
+        </div>
+      </div>
+    </section>
+
+    <!-- Dolabımda ne var? görünümü -->
+    <section id="view-pantry" class="view" hidden></section>
+
+    <!-- Makro hesaplama görünümü -->
+    <section id="view-macro" class="view" hidden></section>
+
+    <!-- Detay görünümü -->
+    <section id="view-detail" class="view" hidden></section>
+
+    <!-- Basit sayfalar -->
+    <section id="view-page" class="view" hidden></section>
+  </main>
+
+  <!-- Alt bilgi -->
+  <footer class="site-footer">
+    <div class="container footer-grid">
+      <div class="footer-brand">
+        <a href="#/" class="logo" aria-label="sofra defteri ana sayfa">
+          <span class="logo-word">s<span class="logo-dot" aria-hidden="true"></span>fra</span>
+          <span class="logo-script">defteri</span>
+        </a>
+        <ul class="socials" role="list">
+          <li><a href="#" aria-label="facebook"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13.5 21v-7.5H16l.4-3h-2.9V8.6c0-.9.3-1.5 1.5-1.5h1.5V4.4c-.3 0-1.2-.1-2.2-.1-2.2 0-3.7 1.3-3.7 3.8v2.4H8.1v3h2.5V21z" fill="currentColor"/></svg></a></li>
+          <li><a href="#" aria-label="instagram"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="4.5" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="3.6" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="16.8" cy="7.2" r="1.1" fill="currentColor"/></svg></a></li>
+          <li><a href="#" aria-label="youtube"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="6" width="18" height="12" rx="3.5" fill="currentColor"/><path d="m10.3 9.3 4.6 2.7-4.6 2.7z" fill="#f3e5dc"/></svg></a></li>
+          <li><a href="#" aria-label="pinterest"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12.2 3.5c-4.8 0-7.2 3.4-7.2 6.3 0 1.7.7 3.3 2.1 3.9.2.1.4 0 .5-.3l.2-.8c.1-.3 0-.4-.2-.6-.4-.5-.7-1.1-.7-2 0-2.6 1.9-4.9 5-4.9 2.7 0 4.2 1.7 4.2 3.9 0 2.9-1.3 5.4-3.2 5.4-1.1 0-1.9-.9-1.6-2 .3-1.3.9-2.7.9-3.6 0-.8-.5-1.5-1.4-1.5-1.1 0-2 1.1-2 2.7 0 1 .3 1.6.3 1.6l-1.4 5.8c-.4 1.7-.1 3.8 0 4 0 .1.2.2.3.1.1-.2 1.4-1.8 1.9-3.4l.7-2.8c.4.7 1.4 1.3 2.5 1.3 3.3 0 5.6-3 5.6-7.1 0-3.1-2.6-6-6.5-6z" fill="currentColor"/></svg></a></li>
+          <li><a href="#" aria-label="tiktok"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15.6 3h-2.9v12.2a2.6 2.6 0 1 1-2.6-2.6c.3 0 .5 0 .8.1v-3a5.6 5.6 0 1 0 4.7 5.5V9.1a7 7 0 0 0 4 1.3V7.5a4.1 4.1 0 0 1-4-4.5z" fill="currentColor"/></svg></a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h2 class="footer-heading">menü</h2>
+        <ul role="list">
+          <li><a href="#/">tarifler</a></li>
+          <li><a href="#/dolabim">dolabımda ne var?</a></li>
+          <li><a href="#/makro">makro hesapla</a></li>
+          <li><a href="#/hakkinda">hakkında</a></li>
+          <li><a href="#/iletisim">iletişim</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h2 class="footer-heading">popüler kategoriler</h2>
+        <ul id="footer-cats" role="list"></ul>
+      </div>
+
+      <div class="footer-col footer-news">
+        <h2 class="footer-heading">haberdar ol</h2>
+        <form id="newsletter" class="newsletter" novalidate>
+          <div class="newsletter-row">
+            <label><span class="visually-hidden">adınız</span><input name="name" type="text" placeholder="ad" autocomplete="name"></label>
+            <label><span class="visually-hidden">e-posta</span><input name="email" type="email" placeholder="e-posta" autocomplete="email" required></label>
+          </div>
+          <button type="submit" class="newsletter-send">gönder <span aria-hidden="true">→</span></button>
+          <p class="newsletter-msg" role="status" aria-live="polite"></p>
+        </form>
+      </div>
+    </div>
+
+    <ul id="footer-strip" class="footer-strip" role="list"></ul>
+
+    <p class="copyright container">
+      © <span id="year"></span> sofra defteri · tarif içerikleri ve görseller
+      <a href="https://www.nefisyemektarifleri.com" target="_blank" rel="noopener">nefisyemektarifleri.com</a>
+      ve tarif sahiplerine aittir. <span id="data-date"></span>
+    </p>
+  </footer>
+
+  <script src="js/icons.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

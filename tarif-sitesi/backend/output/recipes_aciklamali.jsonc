@@ -1,0 +1,63 @@
+// =====================================================================
+// recipes.json — AÇIKLAMALI ÖRNEK (sadece sunum için)
+// ---------------------------------------------------------------------
+// JSON formatı yorum satırını DESTEKLEMEZ. Bu yüzden asıl recipes.json
+// dosyasında yorum yok; bu dosya aynı yapının açıklamalı bir kopyasıdır
+// (.jsonc = yorumlu JSON). Frontend bu dosyayı KULLANMAZ.
+// Üreten kod: models/recipe.py -> RecipeCollection.to_json() ve to_dict()
+// =====================================================================
+{
+  // ---- META: dosya hakkında genel bilgi (RecipeCollection.to_dict) ----
+  "meta": {
+    "source": "nefisyemektarifleri.com",            // veri kaynağı
+    "scraped_at": "2026-10-06T15:44:47",          // verinin çekildiği tarih-saat
+    "total": 60,                                // toplam tarif sayısı
+    "ingredient_groups": ["sebze", "meyve", "et, tavuk, balık", ...],  // malzeme grupları
+    "ingredients": [                                  // "dolabımda ne var?" ekranındaki malzemeler
+      {
+        "name": "soğan",          // malzeme adı
+        "group": "sebze",         // hangi grupta gösterilecek
+        "staple": false,          // tuz/su/baharat gibi evde hep olan mı?
+        "count": 28               // kaç tarifte geçiyor
+      }
+      // ... diğer malzemeler
+    ]
+  },
+
+  // ---- RECIPES: tarif listesi, her eleman bir Recipe nesnesi (Recipe.to_dict) ----
+  "recipes": [
+    {
+      "id": 1,                                    // sıra numarası
+      "key": "recipe1",                            // ödevdeki adlandırma: recipe1, recipe2...
+      "slug": "ezogelin-corbasi-yapilisi-videolu",   // detay sayfası adresi: #/tarif/<slug>
+      "title": "Ezogelin Çorbası Yapılışı (Videolu)",  // yemeğin adı
+      "category": "Çorba Tarifleri",              // kategori (filtre için)
+      "ingredients": [                                // malzemeler, her satır ayrı eleman
+        "1 su bardağı kırmızı mercimek",
+        "1 tatlı kaşığı pirinç"
+        // ... toplam 11 malzeme
+      ],
+      "ingredient_count": 11,                     // malzeme sayısı (ingredient_count())
+      "ingredient_tags": ["mercimek", "pirinç", "bulgur", "pul biber", ...],  // sade malzeme adları -> dolap eşleştirmesi
+      "nutrition": {                                  // 1 porsiyon için TAHMİNİ besin değeri -> makro hesapla
+        "calories": 116,                            // kcal
+        "protein": 6.3,                              // gram
+        "carbs": 18.3,                               // karbonhidrat, gram
+        "fat": 2.1,                                  // yağ, gram
+        "servings_used": 7.0,                        // hesapta kullanılan kişi sayısı
+        "servings_adjusted": false,                // kişi sayısı gerçekçi değilse true
+        "confidence": 1.0,                        // miktarı okunabilen malzeme oranı (0-1)
+        "estimated": true                             // değerler tahmindir
+      },
+      "servings": "6-8 kişilik",                   // porsiyon (ekranda gösterilir)
+      "duration": "15 dakika",                    // süre (ekranda gösterilir)
+      "duration_minutes": 15,                      // süre sayı olarak (filtre için)
+      "image_url": "https://i.nefisyemektarifleri.com/2013/06/ezogelin-corbasi-yapilisi-fotografi.jpg",
+                                                      // yemeğin görseli
+      "image_source": "scraped",                  // "scraped" = siteden, "stock" = yedek görsel
+      "source_url": "https://www.nefisyemektarifleri.com/ezogelin-corbasi-yapilisi/"
+                                                      // orijinal tarif adresi (kaynak gösterme)
+    }
+    // ... diğer 59 tarif
+  ]
+}
